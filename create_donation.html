@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Donation{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header">
+        <h2 class="card-title">🎁 Create New Donation</h2>
+    </div>
+    
+    <form method="POST" action="{{ url_for('create_donation') }}">
+        <div class="form-group">
+            <label class="form-label" for="item_type">Item Type *</label>
+            <select name="item_type" id="item_type" class="form-control" required>
+                <option value="">-- Select item type --</option>
+                <option value="food">🍱 Food</option>
+                <option value="clothes">👕 Clothes</option>
+                <option value="books">📚 Books</option>
+                <option value="toys">🧸 Toys</option>
+                <option value="electronics">💻 Electronics</option>
+                <option value="furniture">🪑 Furniture</option>
+                <option value="other">📦 Other</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="quantity">Quantity *</label>
+            <input type="number" name="quantity" id="quantity" class="form-control" min="1" value="1" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="condition">Condition</label>
+            <select name="condition" id="condition" class="form-control">
+                <option value="new">✨ New</option>
+                <option value="good" selected>👍 Good</option>
+                <option value="fair">👌 Fair</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="description">Description</label>
+            <textarea name="description" id="description" class="form-control" placeholder="Describe the items you're donating (e.g., 5 winter jackets, sizes M-L)"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="location">Pickup Location (Area/City) *</label>
+            <input type="text" name="location" id="location" class="form-control" value="{{ current_user.location }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="pickup_address">Full Pickup Address</label>
+            <textarea name="pickup_address" id="pickup_address" class="form-control" placeholder="Full address for volunteer pickup"></textarea>
+        </div>
+        
+        <div class="form-group" id="expiry-group" style="display: none;">
+            <label class="form-label" for="expiry_date">Expiry Date (for food items)</label>
+            <input type="date" name="expiry_date" id="expiry_date" class="form-control">
+        </div>
+        
+        <div class="flex gap-1">
+            <button type="submit" class="btn btn-primary btn-lg">
+                Create Donation (+10 pts) →
+            </button>
+            <a href="{{ url_for('donor_dashboard') }}" class="btn btn-outline btn-lg">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- Tips -->
+<div class="card mt-3" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+    <div class="card-header">
+        <h3 class="card-title">💡 Tips for Successful Donations</h3>
+    </div>
+    <ul style="padding-left: 1.5rem; color: var(--gray-600);">
+        <li>Ensure items are clean and in usable condition</li>
+        <li>Provide accurate descriptions to help with matching</li>
+        <li>Be available at the pickup address during business hours</li>
+        <li>For food items, ensure proper packaging and check expiry dates</li>
+    </ul>
+</div>
+
+<script>
+    document.getElementById('item_type').addEventListener('change', function() {
+        const expiryGroup = document.getElementById('expiry-group');
+        if (this.value === 'food') {
+            expiryGroup.style.display = 'block';
+        } else {
+            expiryGroup.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

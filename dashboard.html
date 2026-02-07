@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Donor Dashboard{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">🎁 Donor Dashboard</h2>
+        <a href="{{ url_for('create_donation') }}" class="btn btn-primary">+ New Donation</a>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value">{{ donations|length }}</div>
+        <div class="stat-label">Total Donations</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value">{{ completed_donations|length }}</div>
+        <div class="stat-label">Delivered</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-value">{{ total_items }}</div>
+        <div class="stat-label">Items Donated</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-value">{{ current_user.points }}</div>
+        <div class="stat-label">Points Earned</div>
+    </div>
+</div>
+
+<!-- Badges -->
+{% if current_user.get_badges_list() %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">🏆 Your Badges</h3>
+    </div>
+    <div class="flex flex-wrap gap-1">
+        {% for badge in current_user.get_badges_list() %}
+            <span class="badge badge-{% if 'Gold' in badge %}warning{% elif 'Silver' in badge %}gray{% elif 'Platinum' in badge %}primary{% else %}success{% endif %}">
+                {% if 'Bronze' in badge %}🥉{% elif 'Silver' in badge %}🥈{% elif 'Gold' in badge %}🥇{% else %}💎{% endif %}
+                {{ badge }}
+            </span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Active Donations -->
+<div class="dashboard-grid">
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">📦 Active Donations ({{ active_donations|length }})</h3>
+        </div>
+        
+        {% if active_donations %}
+            {% for donation in active_donations %}
+            <div class="item-card">
+                <div class="item-header">
+                    <span class="item-title">
+                        {% if donation.item_type == 'food' %}🍱{% elif donation.item_type == 'clothes' %}👕{% elif donation.item_type == 'books' %}📚{% elif donation.item_type == 'toys' %}🧸{% else %}📦{% endif %}
+                        {{ donation.item_type|title }}
+                    </span>
+                    <span class="badge badge-{% if donation.status == 'available' %}success{% elif donation.status == 'matched' %}warning{% else %}primary{% endif %}">
+                        {{ donation.status|title }}
+                    </span>
+                </div>
+                <div class="item-meta">
+                    <span>📊 {{ donation.quantity }} items</span>
+                    <span>📍 {{ donation.location }}</span>
+                    <span>⏰ {{ donation.created_at.strftime('%d %b') }}</span>
+                </div>
+                {% if donation.description %}
+                <p style="font-size: 0.875rem; color: var(--gray-500);">{{ donation.description }}</p>
+                {% endif %}
+                
+                <!-- Status Flow -->
+                <div class="status-flow">
+                    <div class="status-step">
+                        <div class="status-dot active">✓</div>
+                        <span class="status-label">Created</span>
+                    </div>
+                    <div class="status-line {% if donation.status in ['matched', 'completed'] %}active{% endif %}"></div>
+                    <div class="status-step">
+                        <div class="status-dot {% if donation.status in ['matched', 'completed'] %}active{% elif donation.status == 'available' %}current{% endif %}">2</div>
+                        <span class="status-label">Matched</span>
+                    </div>
+                    <div class="status-line {% if donation.status == 'completed' %}active{% endif %}"></div>
+                    <div class="status-step">
+                        <div class="status-dot {% if donation.status == 'completed' %}active{% endif %}">3</div>
+                        <span class="status-label">Delivered</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <p class="empty-state-text">No active donations</p>
+                <a href="{{ url_for('create_donation') }}" class="btn btn-primary">Create Your First Donation</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Completed Donations -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">✅ Completed ({{ completed_donations|length }})</h3>
+        </div>
+        
+        {% if completed_donations %}
+            {% for donation in completed_donations[:5] %}
+            <div class="item-card">
+                <div class="item-header">
+                    <span class="item-title">
+                        {% if donation.item_type == 'food' %}🍱{% elif donation.item_type == 'clothes' %}👕{% elif donation.item_type == 'books' %}📚{% elif donation.item_type == 'toys' %}🧸{% else %}📦{% endif %}
+                        {{ donation.item_type|title }} - {{ donation.quantity }} items
+                    </span>
+                    <span class="badge badge-success">✓ Delivered</span>
+                </div>
+                <div class="item-meta">
+                    <span>📍 {{ donation.location }}</span>
+                    <span>⏰ {{ donation.created_at.strftime('%d %b') }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p class="empty-state-text">No completed donations yet</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">⚡ Quick Actions</h3>
+    </div>
+    <div class="flex flex-wrap gap-1">
+        <a href="{{ url_for('create_donation') }}" class="btn btn-primary">+ New Donation</a>
+        <a href="{{ url_for('smart_match') }}" class="btn btn-secondary">🔍 Find Matches</a>
+        <a href="{{ url_for('certificate') }}" class="btn btn-outline">📜 View Certificate</a>
+        <a href="{{ url_for('leaderboard') }}" class="btn btn-outline">🏆 Leaderboard</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Task #{{ task.id }} Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📋 Task #{{ task.id }} Details</h2>
+        <span class="badge badge-{% if task.status == 'created' %}gray{% elif task.status == 'assigned' %}warning{% elif task.status == 'picked_up' %}primary{% else %}success{% endif %}">
+            {{ task.status|replace('_', ' ')|title }}
+        </span>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Donation Info -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">📦 Donation Details</h3>
+        </div>
+        
+        <div class="item-card">
+            <div class="item-header">
+                <span class="item-title">
+                    {% if task.donation.item_type == 'food' %}🍱{% elif task.donation.item_type == 'clothes' %}👕{% elif task.donation.item_type == 'books' %}📚{% elif task.donation.item_type == 'toys' %}🧸{% else %}📦{% endif %}
+                    {{ task.donation.item_type|title }}
+                </span>
+                <span class="badge badge-{% if task.donation.condition == 'new' %}success{% elif task.donation.condition == 'good' %}primary{% else %}gray{% endif %}">
+                    {{ task.donation.condition|title }}
+                </span>
+            </div>
+            
+            <div class="item-meta">
+                <span><strong>Quantity:</strong> {{ task.donation.quantity }} items</span>
+            </div>
+            
+            {% if task.donation.description %}
+            <p style="margin-top: 0.5rem; color: var(--gray-600);">{{ task.donation.description }}</p>
+            {% endif %}
+            
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--gray-200);">
+            
+            <p><strong>📍 Pickup Location:</strong> {{ task.donation.location }}</p>
+            {% if task.donation.pickup_address %}
+            <p style="color: var(--gray-600);">{{ task.donation.pickup_address }}</p>
+            {% endif %}
+            
+            <p class="mt-1"><strong>👤 Donor:</strong> {{ task.donation.donor.name }}</p>
+            {% if task.donation.donor.phone %}
+            <p style="color: var(--gray-600);">📱 {{ task.donation.donor.phone }}</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Receiver Info (if matched) -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">🙋 Receiver Details</h3>
+        </div>
+        
+        {% if task.request %}
+        <div class="item-card">
+            <p><strong>📍 Delivery Location:</strong> {{ task.request.location }}</p>
+            {% if task.request.delivery_address %}
+            <p style="color: var(--gray-600);">{{ task.request.delivery_address }}</p>
+            {% endif %}
+            
+            <p class="mt-1"><strong>👤 Receiver:</strong> {{ task.request.receiver.name }}</p>
+            {% if task.request.receiver.phone %}
+            <p style="color: var(--gray-600);">📱 {{ task.request.receiver.phone }}</p>
+            {% endif %}
+            
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--gray-200);">
+            
+            <p><strong>Requested:</strong> {{ task.request.item_type|title }} - {{ task.request.quantity }} items</p>
+            <p><strong>Urgency:</strong> 
+                <span class="badge badge-{% if task.request.urgency == 'urgent' %}danger{% elif task.request.urgency == 'high' %}warning{% else %}gray{% endif %}">
+                    {{ task.request.urgency|title }}
+                </span>
+            </p>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p class="empty-state-text">No specific receiver matched yet</p>
+            <p style="font-size: 0.875rem;">Deliver to a nearby community center or NGO</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Status Flow -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">📊 Task Progress</h3>
+    </div>
+    
+    <div class="status-flow" style="padding: 1rem 0;">
+        <div class="status-step">
+            <div class="status-dot active">✓</div>
+            <span class="status-label">Created</span>
+        </div>
+        <div class="status-line {% if task.status in ['assigned', 'picked_up', 'delivered'] %}active{% endif %}"></div>
+        <div class="status-step">
+            <div class="status-dot {% if task.status in ['assigned', 'picked_up', 'delivered'] %}active{% elif task.status == 'created' %}current{% endif %}">2</div>
+            <span class="status-label">Assigned</span>
+        </div>
+        <div class="status-line {% if task.status in ['picked_up', 'delivered'] %}active{% endif %}"></div>
+        <div class="status-step">
+            <div class="status-dot {% if task.status in ['picked_up', 'delivered'] %}active{% elif task.status == 'assigned' %}current{% endif %}">3</div>
+            <span class="status-label">Picked Up</span>
+        </div>
+        <div class="status-line {% if task.status == 'delivered' %}active{% endif %}"></div>
+        <div class="status-step">
+            <div class="status-dot {% if task.status == 'delivered' %}active{% elif task.status == 'picked_up' %}current{% endif %}">4</div>
+            <span class="status-label">Delivered</span>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    {% if task.volunteer_id == current_user.id %}
+    <div class="flex gap-1 mt-2">
+        {% if task.status == 'assigned' %}
+            <a href="{{ url_for('update_task', task_id=task.id, status='picked_up') }}" class="btn btn-primary">
+                ✓ Mark as Picked Up
+            </a>
+        {% elif task.status == 'picked_up' %}
+            <a href="{{ url_for('update_task', task_id=task.id, status='delivered') }}" class="btn btn-secondary">
+                ✓ Mark as Delivered (+15 pts)
+            </a>
+        {% endif %}
+    </div>
+    {% elif not task.volunteer_id %}
+    <div class="flex gap-1 mt-2">
+        <a href="{{ url_for('accept_task', task_id=task.id) }}" class="btn btn-primary">Accept This Task</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Activity Timeline -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">📜 Activity Timeline</h3>
+    </div>
+    
+    <div class="timeline">
+        {% for log in logs %}
+        <div class="timeline-item">
+            <div class="timeline-time">{{ log.timestamp.strftime('%d %b, %H:%M') }}</div>
+            <div class="timeline-content">{{ log.action }}</div>
+        </div>
+        {% endfor %}
+        
+        {% if not logs %}
+        <div class="timeline-item">
+            <div class="timeline-time">{{ task.created_at.strftime('%d %b, %H:%M') }}</div>
+            <div class="timeline-content">Task created</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{{ url_for('volunteer_dashboard') }}" class="btn btn-outline">← Back to Dashboard</a>
+</div>
+{% endblock %}

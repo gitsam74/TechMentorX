@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Request{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header">
+        <h2 class="card-title">🙋 Create New Request</h2>
+    </div>
+    
+    <form method="POST" action="{{ url_for('create_request') }}">
+        <div class="form-group">
+            <label class="form-label" for="item_type">What do you need? *</label>
+            <select name="item_type" id="item_type" class="form-control" required>
+                <option value="">-- Select item type --</option>
+                <option value="food">🍱 Food</option>
+                <option value="clothes">👕 Clothes</option>
+                <option value="books">📚 Books/Stationery</option>
+                <option value="toys">🧸 Toys</option>
+                <option value="electronics">💻 Electronics</option>
+                <option value="furniture">🪑 Furniture</option>
+                <option value="other">📦 Other</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="quantity">Quantity Needed *</label>
+            <input type="number" name="quantity" id="quantity" class="form-control" min="1" value="1" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="urgency">Urgency Level</label>
+            <select name="urgency" id="urgency" class="form-control">
+                <option value="low">🟢 Low - Anytime in the next few weeks</option>
+                <option value="normal" selected>🟡 Normal - Within a week</option>
+                <option value="high">🟠 High - Within 2-3 days</option>
+                <option value="urgent">🔴 Urgent - As soon as possible</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="description">Description / Details</label>
+            <textarea name="description" id="description" class="form-control" placeholder="Describe what you need (e.g., winter clothes for 3 children, sizes 6-10 years)"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="location">Your Location (Area/City) *</label>
+            <input type="text" name="location" id="location" class="form-control" value="{{ current_user.location }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="delivery_address">Full Delivery Address</label>
+            <textarea name="delivery_address" id="delivery_address" class="form-control" placeholder="Full address where donation should be delivered"></textarea>
+        </div>
+        
+        <div class="flex gap-1">
+            <button type="submit" class="btn btn-primary btn-lg">
+                Submit Request →
+            </button>
+            <a href="{{ url_for('receiver_dashboard') }}" class="btn btn-outline btn-lg">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- Tips -->
+<div class="card mt-3" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+    <div class="card-header">
+        <h3 class="card-title">💡 Tips for Better Matching</h3>
+    </div>
+    <ul style="padding-left: 1.5rem; color: var(--gray-600);">
+        <li>Be specific about quantities and sizes if applicable</li>
+        <li>Accurate location helps find nearby donations faster</li>
+        <li>Set appropriate urgency - urgent requests get priority</li>
+        <li>Check "Smart Match" regularly for new donations</li>
+    </ul>
+</div>
+{% endblock %}
