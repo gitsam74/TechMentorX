@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>🤝 Social Mentor</h1>
+    <p>A location-aware, gamified social donation network that matches donors, students, and local volunteers in real time.</p>
+    
+    {% if not current_user.is_authenticated %}
+        <div class="hero-buttons">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Join as Donor</a>
+            <a href="{{ url_for('register') }}" class="btn btn-secondary btn-lg">Become a Volunteer</a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline btn-lg">Request Help</a>
+        </div>
+    {% else %}
+        <div class="hero-buttons">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+            <a href="{{ url_for('impact') }}" class="btn btn-outline btn-lg">View Impact</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Stats Section -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value">{{ stats.total_donations }}</div>
+        <div class="stat-label">Total Donations</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value">{{ stats.completed_deliveries }}</div>
+        <div class="stat-label">Deliveries Completed</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-value">{{ stats.total_users }}</div>
+        <div class="stat-label">Active Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🚴</div>
+        <div class="stat-value">{{ stats.total_volunteers }}</div>
+        <div class="stat-label">Volunteers</div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="dashboard-grid">
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">📍 Location-Based Matching</h3>
+        </div>
+        <p>Our smart algorithm matches donors with nearby receivers and volunteers, ensuring quick and efficient donations within your community.</p>
+    </div>
+    
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">🏆 Gamification & Rewards</h3>
+        </div>
+        <p>Earn points for every donation and delivery. Unlock badges like Bronze, Silver, and Gold Helper. Download certificates for your contributions!</p>
+    </div>
+    
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">📊 Impact Tracking</h3>
+        </div>
+        <p>Every donation is tracked from creation to delivery. See exactly who donated, who delivered, and who received - complete transparency!</p>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+{% if recent_donations %}
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">🕐 Recent Donations</h3>
+        <a href="{{ url_for('impact') }}" class="btn btn-sm btn-outline">View All</a>
+    </div>
+    
+    {% for donation in recent_donations %}
+    <div class="item-card">
+        <div class="item-header">
+            <span class="item-title">
+                {% if donation.item_type == 'food' %}🍱{% elif donation.item_type == 'clothes' %}👕{% elif donation.item_type == 'books' %}📚{% elif donation.item_type == 'toys' %}🧸{% else %}📦{% endif %}
+                {{ donation.item_type|title }} - {{ donation.quantity }} items
+            </span>
+            <span class="badge badge-{% if donation.status == 'available' %}success{% elif donation.status == 'matched' %}warning{% else %}primary{% endif %}">
+                {{ donation.status|title }}
+            </span>
+        </div>
+        <div class="item-meta">
+            <span>📍 {{ donation.location }}</span>
+            <span>⏰ {{ donation.created_at.strftime('%d %b, %H:%M') }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- How It Works -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">🔄 How It Works</h3>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">1️⃣</div>
+            <div class="stat-label"><strong>Donor</strong> creates a donation offer</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">2️⃣</div>
+            <div class="stat-label"><strong>System</strong> matches with nearby requests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">3️⃣</div>
+            <div class="stat-label"><strong>Volunteer</strong> accepts & picks up</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">4️⃣</div>
+            <div class="stat-label"><strong>Delivery</strong> to receiver, impact tracked!</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

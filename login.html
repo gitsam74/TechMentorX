@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 450px; margin: 2rem auto;">
+    <div class="card-header">
+        <h2 class="card-title">🔐 Login to Social Mentor</h2>
+    </div>
+    
+    <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="your@email.com" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+            Login →
+        </button>
+    </form>
+    
+    <div class="text-center mt-2">
+        <p>Don't have an account? <a href="{{ url_for('register') }}" style="color: var(--primary); font-weight: 600;">Sign up here</a></p>
+    </div>
+</div>
+{% endblock %}

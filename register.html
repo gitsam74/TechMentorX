@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 2rem auto;">
+    <div class="card-header">
+        <h2 class="card-title">📝 Join Social Mentor</h2>
+    </div>
+    
+    <form method="POST" action="{{ url_for('register') }}">
+        <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <input type="text" name="name" id="name" class="form-control" placeholder="John Doe" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="your@email.com" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" minlength="6" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="role">I want to...</label>
+            <select name="role" id="role" class="form-control" required>
+                <option value="">-- Select your role --</option>
+                <option value="donor">🎁 Donate items (Donor)</option>
+                <option value="volunteer">🚴 Help deliver donations (Volunteer)</option>
+                <option value="receiver">🙋 Receive donations (Student/NGO)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="location">Location (City/Area)</label>
+            <input type="text" name="location" id="location" class="form-control" placeholder="e.g., Pimpri, Pune" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="phone">Phone Number (Optional)</label>
+            <input type="tel" name="phone" id="phone" class="form-control" placeholder="+91 9876543210">
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+            Create Account →
+        </button>
+    </form>
+    
+    <div class="text-center mt-2">
+        <p>Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary); font-weight: 600;">Login here</a></p>
+    </div>
+</div>
+
+<!-- Role Benefits -->
+<div class="dashboard-grid mt-3">
+    <div class="dashboard-section">
+        <h3 class="section-title">🎁 Donors</h3>
+        <p>Share food, clothes, books, and more with those in need. Earn points and badges for your generosity!</p>
+    </div>
+    <div class="dashboard-section">
+        <h3 class="section-title">🚴 Volunteers</h3>
+        <p>Pick up donations and deliver them to receivers. Build your volunteering portfolio with certificates!</p>
+    </div>
+    <div class="dashboard-section">
+        <h3 class="section-title">🙋 Students/NGOs</h3>
+        <p>Request items you need and get matched with nearby donors. Track your fulfilled requests!</p>
+    </div>
+</div>
+{% endblock %}

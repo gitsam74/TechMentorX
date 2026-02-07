@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Impact Dashboard{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>📊 Our Impact</h1>
+    <p>Transparent tracking of every donation - from creation to delivery</p>
+</div>
+
+<!-- Stats Overview -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value">{{ stats.total_donations }}</div>
+        <div class="stat-label">Total Donations</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value">{{ stats.completed_deliveries }}</div>
+        <div class="stat-label">Successful Deliveries</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-value">{{ stats.items_donated }}</div>
+        <div class="stat-label">Items Donated</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-value">{{ stats.total_users }}</div>
+        <div class="stat-label">Community Members</div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Top Volunteers -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">🏆 Top Volunteers</h3>
+        </div>
+        
+        {% if top_volunteers %}
+            {% for volunteer in top_volunteers %}
+            <div class="leaderboard-item">
+                <span class="leaderboard-rank">{{ loop.index }}</span>
+                <span class="leaderboard-name">
+                    {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% endif %}
+                    {{ volunteer.name }}
+                </span>
+                <span class="leaderboard-points">{{ volunteer.points }} pts</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>No volunteers yet - be the first!</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Top Donors -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">💝 Top Donors</h3>
+        </div>
+        
+        {% if top_donors %}
+            {% for donor in top_donors %}
+            <div class="leaderboard-item">
+                <span class="leaderboard-rank">{{ loop.index }}</span>
+                <span class="leaderboard-name">
+                    {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% endif %}
+                    {{ donor.name }}
+                </span>
+                <span class="leaderboard-points">{{ donor.points }} pts</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>No donors yet - be the first!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Recent Completed Deliveries -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">🕐 Recent Completed Deliveries</h3>
+    </div>
+    
+    {% if completed_tasks %}
+        {% for task in completed_tasks %}
+        <div class="item-card">
+            <div class="item-header">
+                <span class="item-title">
+                    {% if task.donation.item_type == 'food' %}🍱{% elif task.donation.item_type == 'clothes' %}👕{% elif task.donation.item_type == 'books' %}📚{% elif task.donation.item_type == 'toys' %}🧸{% else %}📦{% endif %}
+                    {{ task.donation.item_type|title }} - {{ task.donation.quantity }} items
+                </span>
+                <span class="badge badge-success">✓ Delivered</span>
+            </div>
+            <div class="item-meta">
+                <span>📍 {{ task.donation.location }}</span>
+                <span>⏰ {{ task.delivered_at.strftime('%d %b, %H:%M') if task.delivered_at else 'N/A' }}</span>
+            </div>
+            <div class="item-meta" style="font-size: 0.8rem;">
+                <span>🎁 Donor: {{ task.donation.donor.name }}</span>
+                <span>🚴 Volunteer: {{ task.volunteer.name if task.volunteer else 'N/A' }}</span>
+                {% if task.request %}
+                <span>🙋 Receiver: {{ task.request.receiver.name }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p class="empty-state-text">No completed deliveries yet</p>
+            <p style="font-size: 0.875rem;">Be the first to make a donation!</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Call to Action -->
+<div class="card mt-3 text-center">
+    <h3>Join Our Growing Community!</h3>
+    <p style="color: var(--gray-600); margin: 1rem 0;">Every donation makes a difference. Start contributing today.</p>
+    <div class="flex justify-between gap-1" style="justify-content: center;">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Join Now</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline btn-lg">Login</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

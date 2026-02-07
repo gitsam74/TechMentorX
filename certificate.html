@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Certificate{% endblock %}
+
+{% block content %}
+<div class="card text-center">
+    <h2>📜 Your Contribution Certificate</h2>
+    <p style="color: var(--gray-600);">A record of your valuable contributions to the community</p>
+</div>
+
+<!-- Certificate -->
+<div class="certificate mt-3">
+    <div style="position: relative; z-index: 1;">
+        <div class="certificate-title">Certificate of Appreciation</div>
+        <div class="certificate-subtitle">Social Mentor - Donation Network</div>
+        
+        <p style="margin-top: 2rem; color: var(--gray-600);">This is to certify that</p>
+        
+        <div class="certificate-name">{{ user.name }}</div>
+        
+        <p class="certificate-text">
+            has actively contributed as a <strong>{{ user.role|title }}</strong> 
+            and has successfully completed
+        </p>
+        
+        <div class="certificate-count">{{ completed_count }}</div>
+        <p style="font-size: 1.25rem; color: var(--gray-600);">
+            {% if user.role == 'volunteer' %}
+                donation deliveries
+            {% elif user.role == 'donor' %}
+                donations
+            {% else %}
+                activities
+            {% endif %}
+        </p>
+        
+        <p class="certificate-text">
+            with a total of <strong>{{ user.points }} points</strong> earned
+        </p>
+        
+        {% if user.get_badges_list() %}
+        <div class="mt-2">
+            <p style="font-size: 0.875rem; color: var(--gray-500);">Badges Earned:</p>
+            <div class="flex gap-1" style="justify-content: center; margin-top: 0.5rem;">
+                {% for badge in user.get_badges_list() %}
+                <span class="badge badge-{% if 'Gold' in badge %}warning{% elif 'Silver' in badge %}gray{% elif 'Platinum' in badge %}primary{% else %}success{% endif %}">
+                    {% if 'Bronze' in badge %}🥉{% elif 'Silver' in badge %}🥈{% elif 'Gold' in badge %}🥇{% else %}💎{% endif %}
+                    {{ badge }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div style="margin-top: 2rem;">
+            <p style="font-size: 0.875rem; color: var(--gray-500);">
+                📍 Location: {{ user.location }}<br>
+                📅 Member since: {{ user.created_at.strftime('%B %Y') }}<br>
+                🆔 Certificate ID: SM-{{ user.id }}-{{ user.created_at.strftime('%Y%m') }}
+            </p>
+        </div>
+        
+        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px dashed var(--gray-300);">
+            <p style="font-style: italic; color: var(--gray-500);">
+                "Making a difference, one donation at a time"
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="card mt-3 text-center">
+    <div class="flex gap-1" style="justify-content: center;">
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Print Certificate</button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">← Back to Dashboard</a>
+    </div>
+</div>
+
+<!-- Tips -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">💡 Use Your Certificate</h3>
+    </div>
+    <ul style="padding-left: 1.5rem; color: var(--gray-600);">
+        <li>Add it to your resume or portfolio</li>
+        <li>Share with your college/university for activity credits</li>
+        <li>Include in scholarship applications</li>
+        <li>Post on LinkedIn to showcase your social impact</li>
+    </ul>
+</div>
+
+<style>
+    @media print {
+        .navbar, .footer, .card:not(.certificate), .btn {
+            display: none !important;
+        }
+        .main-container {
+            padding: 0;
+        }
+        .certificate {
+            border-width: 4px;
+            page-break-inside: avoid;
+        }
+    }
+</style>
+{% endblock %}

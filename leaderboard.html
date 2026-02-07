@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Leaderboard{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>🏆 Leaderboard</h1>
+    <p>Celebrating our top contributors who are making a difference!</p>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Top Volunteers -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">🚴 Top Volunteers</h3>
+        </div>
+        
+        {% if volunteers %}
+            {% for volunteer in volunteers %}
+            <div class="leaderboard-item">
+                <span class="leaderboard-rank">
+                    {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
+                </span>
+                <div class="leaderboard-name">
+                    <div>{{ volunteer.name }}</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-500);">📍 {{ volunteer.location }}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="leaderboard-points">{{ volunteer.points }} pts</div>
+                    {% if volunteer.badges %}
+                    <div style="font-size: 0.7rem; color: var(--gray-500);">
+                        {% for badge in volunteer.get_badges_list()[:2] %}
+                            {% if 'Bronze' in badge %}🥉{% elif 'Silver' in badge %}🥈{% elif 'Gold' in badge %}🥇{% else %}💎{% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🚴</div>
+                <p class="empty-state-text">No volunteers yet</p>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Become a Volunteer</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Top Donors -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h3 class="section-title">🎁 Top Donors</h3>
+        </div>
+        
+        {% if donors %}
+            {% for donor in donors %}
+            <div class="leaderboard-item">
+                <span class="leaderboard-rank">
+                    {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
+                </span>
+                <div class="leaderboard-name">
+                    <div>{{ donor.name }}</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-500);">📍 {{ donor.location }}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="leaderboard-points">{{ donor.points }} pts</div>
+                    {% if donor.badges %}
+                    <div style="font-size: 0.7rem; color: var(--gray-500);">
+                        {% for badge in donor.get_badges_list()[:2] %}
+                            {% if 'Bronze' in badge %}🥉{% elif 'Silver' in badge %}🥈{% elif 'Gold' in badge %}🥇{% else %}💎{% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🎁</div>
+                <p class="empty-state-text">No donors yet</p>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Start Donating</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Badge Info -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">🏅 Badge Levels</h3>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🥉</div>
+            <div class="stat-label"><strong>Bronze Helper</strong><br>10+ points</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🥈</div>
+            <div class="stat-label"><strong>Silver Helper</strong><br>50+ points</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🥇</div>
+            <div class="stat-label"><strong>Gold Helper</strong><br>100+ points</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💎</div>
+            <div class="stat-label"><strong>Platinum Helper</strong><br>200+ points</div>
+        </div>
+    </div>
+</div>
+
+<!-- How to Earn Points -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">💡 How to Earn Points</h3>
+    </div>
+    <div class="dashboard-grid">
+        <div>
+            <h4>🎁 Donors</h4>
+            <ul style="padding-left: 1.5rem; color: var(--gray-600);">
+                <li><strong>+10 points</strong> for each donation created</li>
+                <li>Bonus points for consistent donations</li>
+            </ul>
+        </div>
+        <div>
+            <h4>🚴 Volunteers</h4>
+            <ul style="padding-left: 1.5rem; color: var(--gray-600);">
+                <li><strong>+15 points</strong> for each delivery completed</li>
+                <li>Bonus points for urgent deliveries</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart Match{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">🔍 Smart Match</h2>
+        <span class="badge badge-primary">AI-Powered Matching</span>
+    </div>
+    <p style="color: var(--gray-600);">
+        Our smart matching algorithm finds the best donation-request pairs based on location, item type, and urgency.
+    </p>
+</div>
+
+{% if role == 'receiver' %}
+<!-- Receiver View: Show matching donations for their requests -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">📦 Matching Donations for Your Requests</h3>
+    </div>
+    
+    {% if matches %}
+        {% for match in matches %}
+        <div class="item-card" style="border-left: 4px solid var(--secondary);">
+            <h4 style="margin-bottom: 0.5rem;">
+                Your Request: {{ match.request.item_type|title }} - {{ match.request.quantity }} items
+                <span class="badge badge-{% if match.request.urgency == 'urgent' %}danger{% elif match.request.urgency == 'high' %}warning{% else %}gray{% endif %}">
+                    {{ match.request.urgency|title }}
+                </span>
+            </h4>
+            <p style="font-size: 0.875rem; color: var(--gray-500);">📍 {{ match.request.location }}</p>
+            
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--gray-200);">
+                <p style="font-weight: 600; color: var(--secondary);">✨ {{ match.donations|length }} Matching Donation(s) Found:</p>
+                
+                {% for donation in match.donations %}
+                <div style="background: var(--gray-100); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                    <div class="item-header">
+                        <span class="item-title">
+                            {% if donation.item_type == 'food' %}🍱{% elif donation.item_type == 'clothes' %}👕{% elif donation.item_type == 'books' %}📚{% elif donation.item_type == 'toys' %}🧸{% else %}📦{% endif %}
+                            {{ donation.item_type|title }} - {{ donation.quantity }} items
+                        </span>
+                        <span class="badge badge-success">{{ donation.condition|title }}</span>
+                    </div>
+                    <div class="item-meta">
+                        <span>📍 {{ donation.location }}</span>
+                        <span>🎁 From: {{ donation.donor.name }}</span>
+                    </div>
+                    {% if donation.description %}
+                    <p style="font-size: 0.8rem; color: var(--gray-500);">{{ donation.description[:100] }}</p>
+                    {% endif %}
+                    <div class="item-actions">
+                        <a href="{{ url_for('connect_match', donation_id=donation.id, request_id=match.request.id) }}" class="btn btn-secondary btn-sm">
+                            ✓ Connect with this Donation
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <p class="empty-state-text">No matches found</p>
+            <p style="font-size: 0.875rem;">Make sure you have pending requests with matching item types and locations.</p>
+            <a href="{{ url_for('create_request') }}" class="btn btn-primary mt-2">Create a Request</a>
+        </div>
+    {% endif %}
+</div>
+
+{% elif role == 'donor' %}
+<!-- Donor View: Show matching requests for their donations -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">🙋 Matching Requests for Your Donations</h3>
+    </div>
+    
+    {% if matches %}
+        {% for match in matches %}
+        <div class="item-card" style="border-left: 4px solid var(--primary);">
+            <h4 style="margin-bottom: 0.5rem;">
+                Your Donation: {{ match.donation.item_type|title }} - {{ match.donation.quantity }} items
+                <span class="badge badge-success">{{ match.donation.condition|title }}</span>
+            </h4>
+            <p style="font-size: 0.875rem; color: var(--gray-500);">📍 {{ match.donation.location }}</p>
+            
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--gray-200);">
+                <p style="font-weight: 600; color: var(--primary);">✨ {{ match.requests|length }} Matching Request(s) Found:</p>
+                
+                {% for req in match.requests %}
+                <div style="background: var(--gray-100); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                    <div class="item-header">
+                        <span class="item-title">
+                            {% if req.item_type == 'food' %}🍱{% elif req.item_type == 'clothes' %}👕{% elif req.item_type == 'books' %}📚{% elif req.item_type == 'toys' %}🧸{% else %}📦{% endif %}
+                            {{ req.item_type|title }} - {{ req.quantity }} items needed
+                        </span>
+                        <span class="badge badge-{% if req.urgency == 'urgent' %}danger{% elif req.urgency == 'high' %}warning{% else %}gray{% endif %}">
+                            {{ req.urgency|title }}
+                        </span>
+                    </div>
+                    <div class="item-meta">
+                        <span>📍 {{ req.location }}</span>
+                        <span>🙋 By: {{ req.receiver.name }}</span>
+                    </div>
+                    {% if req.description %}
+                    <p style="font-size: 0.8rem; color: var(--gray-500);">{{ req.description[:100] }}</p>
+                    {% endif %}
+                    <div class="item-actions">
+                        <a href="{{ url_for('connect_match', donation_id=match.donation.id, request_id=req.id) }}" class="btn btn-primary btn-sm">
+                            ✓ Match with this Request
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <p class="empty-state-text">No matches found</p>
+            <p style="font-size: 0.875rem;">Make sure you have available donations with matching item types and locations.</p>
+            <a href="{{ url_for('create_donation') }}" class="btn btn-primary mt-2">Create a Donation</a>
+        </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- How Matching Works -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">💡 How Smart Matching Works</h3>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📍</div>
+            <div class="stat-label"><strong>Location</strong><br>Same area/city</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-label"><strong>Item Type</strong><br>Matching categories</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-label"><strong>Urgency</strong><br>Priority for urgent</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-label"><strong>Rating</strong><br>Top contributors first</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

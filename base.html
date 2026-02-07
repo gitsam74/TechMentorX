@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Social Mentor{% endblock %} | Donation Network</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="nav-brand">
+                🤝 <span>Social Mentor</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('impact') }}" class="nav-link">Impact</a>
+                <a href="{{ url_for('leaderboard') }}" class="nav-link">Leaderboard</a>
+                
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                    {% if current_user.role != 'volunteer' %}
+                        <a href="{{ url_for('smart_match') }}" class="nav-link">Smart Match</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            
+            <div class="nav-user">
+                {% if current_user.is_authenticated %}
+                    <div class="user-info">
+                        <div class="user-name">{{ current_user.name }}</div>
+                        <div class="user-role">{{ current_user.role }}</div>
+                    </div>
+                    <span class="user-points">⭐ {{ current_user.points }} pts</span>
+                    <a href="{{ url_for('certificate') }}" class="btn btn-sm btn-outline">Certificate</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-sm btn-danger">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline">Login</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <main class="main-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {% if category == 'success' %}✅{% elif category == 'error' %}❌{% else %}ℹ️{% endif %}
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="footer">
+        <p>© 2024 Social Mentor - Connecting Donors, Volunteers & Those in Need</p>
+        <p>Built with ❤️ for MPS-06 Hackathon</p>
+    </footer>
+</body>
+</html>
